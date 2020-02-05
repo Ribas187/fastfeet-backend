@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import cep from 'cep-promise';
 
 import Recipient from '../models/Recipient';
 
@@ -12,11 +13,11 @@ class RecipientController {
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
-      street: Yup.string().required(),
+      street: Yup.string(),
       number: Yup.number().required(),
       complement: Yup.string(),
-      state: Yup.string().required(),
-      city: Yup.string().required(),
+      state: Yup.string(),
+      city: Yup.string(),
       postcode: Yup.string().required(),
     });
 
@@ -26,7 +27,7 @@ class RecipientController {
       });
     }
 
-    const { name, number, postcode } = req.body;
+    const { name, number, postcode, complement = null } = req.body;
 
     const recipientExists = await Recipient.findOne({
       where: { name, number, postcode },
@@ -38,12 +39,32 @@ class RecipientController {
       });
     }
 
-    const { id } = await Recipient.create(req.body);
+    const cepAddress = await cep(postcode);
+
+    if (!cepAddress) {
+      return res.status(400).json({ error: 'Invalid postcode.' });
+    }
+
+    const { state, city, street } = cepAddress;
+
+    const { id } = await Recipient.create({
+      name,
+      street,
+      city,
+      state,
+      number,
+      complement,
+      postcode,
+    });
 
     return res.json({
       id,
       name,
+      street,
+      city,
+      state,
       number,
+      complement,
       postcode,
     });
   }
@@ -69,7 +90,29 @@ class RecipientController {
 
     const recipient = await Recipient.findByPk(id);
 
-    const updated = await recipient.update(req.body);
+    if (!recipient) {
+      return res.status(400).json({ error: 'User does not exist.' });
+    }
+
+    const { postcode, name, number } = req.body;
+
+    const cepAddress = await cep(postcode);
+
+    if (!cepAddress) {
+      return res.status(400).json({ error: 'Invalid postcode.' });
+    }
+
+    const { state, city, street, complement } = cepAddress;
+
+    const updated = await recipient.update({
+      name,
+      street,
+      city,
+      state,
+      number,
+      complement,
+      postcode,
+    });
 
     return res.json(updated);
   }
