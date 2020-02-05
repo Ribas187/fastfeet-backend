@@ -14,7 +14,9 @@ class RecipientController {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
       street: Yup.string(),
-      number: Yup.number().required(),
+      number: Yup.number()
+        .positive()
+        .required(),
       complement: Yup.string(),
       state: Yup.string(),
       city: Yup.string(),
@@ -73,7 +75,7 @@ class RecipientController {
     const schema = Yup.object().shape({
       name: Yup.string(),
       street: Yup.string(),
-      number: Yup.number(),
+      number: Yup.number().positive(),
       complement: Yup.string(),
       state: Yup.string(),
       city: Yup.string(),
