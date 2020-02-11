@@ -41,7 +41,7 @@ class RecipientController {
       });
     }
 
-    const cepAddress = await cep(postcode);
+    const cepAddress = await cep(postcode).catch(() => null);
 
     if (!cepAddress) {
       return res.status(400).json({ error: 'Invalid postcode.' });
@@ -98,7 +98,7 @@ class RecipientController {
 
     const { postcode, name, number } = req.body;
 
-    const cepAddress = await cep(postcode);
+    const cepAddress = await cep(postcode).catch(() => null);
 
     if (!cepAddress) {
       return res.status(400).json({ error: 'Invalid postcode.' });
@@ -117,6 +117,16 @@ class RecipientController {
     });
 
     return res.json(updated);
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    const recipient = await Recipient.findByPk(id);
+
+    await recipient.destroy();
+
+    return res.send(200);
   }
 }
 
