@@ -4,10 +4,17 @@ import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
+import Queue from '../../lib/Queue';
+import NewDeliveryMail from '../jobs/NewDeliveryMail';
 
 class DeliveryController {
   async index(req, res) {
+    const { page = 1 } = req.query;
+
     const deliveries = await Delivery.findAll({
+      limit: 20,
+      offset: (page - 1) * 20,
+      order: [['id', 'ASC']],
       attributes: ['id', 'product', 'start_date', 'end_date', 'canceled_at'],
       include: [
         {
@@ -95,6 +102,11 @@ class DeliveryController {
     }
 
     const delivery = await Delivery.create(req.body);
+
+    const deliveryman = await Deliveryman.findByPk(delivery.deliveryman_id);
+    const recipient = await Recipient.findByPk(delivery.recipient_id);
+
+    await Queue.add(NewDeliveryMail.key, { deliveryman, recipient, delivery });
 
     return res.json(delivery);
   }
