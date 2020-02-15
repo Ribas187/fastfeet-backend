@@ -14,12 +14,18 @@ class WithdrawDeliveryController {
       return res.json({ error: 'Deliveryman ID does not exist.' });
     }
 
-    const deliveryExists = await Delivery.findByPk(delivery_id);
+    const deliveryExists = await Delivery.findByPk(delivery_id, {
+      include: {
+        model: Deliveryman,
+        as: 'deliveryman',
+        attributes: ['id'],
+      },
+    });
 
     if (!deliveryExists) {
       return res.json({ error: 'Delivery ID does not exist.' });
     }
-    if (deliveryExists.deliveryman_id !== deliveryman_id) {
+    if (deliveryExists.deliveryman.id !== Number(deliveryman_id)) {
       return res.json({
         error: `You cannot withdraw other people's delivery.`,
       });
