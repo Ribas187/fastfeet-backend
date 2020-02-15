@@ -1,12 +1,18 @@
-import { startOfDay, endOfDay } from 'date-fns';
-import { Op } from 'sequelize';
-
 import Deliveryman from '../models/Deliveryman';
 import Delivery from '../models/Delivery';
+import File from '../models/File';
 
-class WithdrawDeliveryController {
+class FinishDeliveryController {
   async update(req, res) {
     const { deliveryman_id, delivery_id } = req.params;
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ error: 'You must send a signature picture.' });
+    }
+
+    const { filename: path, originalname: name } = req.file;
 
     const deliverymanExists = await Deliveryman.findByPk(deliveryman_id);
 
@@ -27,7 +33,7 @@ class WithdrawDeliveryController {
     }
     if (deliveryExists.deliveryman.id !== Number(deliveryman_id)) {
       return res.status(400).json({
-        error: `You cannot withdraw other people's delivery.`,
+        error: `You cannot deliver other people's delivery.`,
       });
     }
     if (deliveryExists.canceled_at) {
@@ -35,50 +41,26 @@ class WithdrawDeliveryController {
         error: 'Delivery has been canceled.',
       });
     }
-    if (deliveryExists.start_date) {
-      return res.status(400).json({
-        error: 'Delivery has already been withdrawn.',
-      });
-    }
     if (deliveryExists.end_date) {
       return res.status(400).json({
-        error: 'Delivery has already been delivered.',
+        error: 'Product has already been delivered.',
       });
     }
 
-    const withdrawHour = 10;
-
-    if (withdrawHour < 8 || withdrawHour > 18) {
-      return res.status(400).json({
-        error: 'You can only withdraw from 08:00h to 18:00h.',
-      });
-    }
-
-    const today = 1581729334000;
-
-    const todayWithdraws = await Delivery.findAll({
-      where: {
-        deliveryman_id,
-        start_date: {
-          [Op.between]: [startOfDay(today), endOfDay(today)],
-        },
-      },
+    const file = await File.create({
+      name,
+      path,
     });
-
-    if (todayWithdraws.length >= 5) {
-      return res.status(400).json({
-        error: 'You can only withdraw up to 5 deliveries per day',
-      });
-    }
 
     const delivery = deliveryExists;
 
     const updatedDelivery = await delivery.update({
-      start_date: new Date(),
+      end_date: new Date(),
+      signature_id: file.id,
     });
 
     return res.json(updatedDelivery);
   }
 }
 
-export default new WithdrawDeliveryController();
+export default new FinishDeliveryController();
