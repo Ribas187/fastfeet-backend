@@ -1,10 +1,8 @@
-import { startOfDay, endOfDay, format, parseISO } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
 import { Op } from 'sequelize';
 
 import Deliveryman from '../models/Deliveryman';
 import Delivery from '../models/Delivery';
-
-import withdrawHours from '../../utils/withdrawHours';
 
 class WithdrawDeliveryController {
   async update(req, res) {
@@ -21,7 +19,7 @@ class WithdrawDeliveryController {
     if (!deliveryExists) {
       return res.json({ error: 'Delivery ID does not exist.' });
     }
-    if (!deliveryExists.deliveryman_id === deliveryman_id) {
+    if (deliveryExists.deliveryman_id !== deliveryman_id) {
       return res.json({
         error: `You cannot withdraw other people's delivery.`,
       });
