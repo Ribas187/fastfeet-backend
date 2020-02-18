@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 
+// Seed to create an admin user
 module.exports = {
   up: QueryInterface => {
     return QueryInterface.bulkInsert(

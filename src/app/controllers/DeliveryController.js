@@ -11,6 +11,7 @@ class DeliveryController {
   async index(req, res) {
     const { page = 1 } = req.query;
 
+    // Search query
     const deliveries = await Delivery.findAll({
       limit: 20,
       offset: (page - 1) * 20,
@@ -50,6 +51,7 @@ class DeliveryController {
   async show(req, res) {
     const { id } = req.params;
 
+    // Search query
     const delivery = await Delivery.findByPk(id, {
       attributes: ['id', 'product', 'start_date', 'end_date', 'canceled_at'],
       include: [
@@ -80,6 +82,7 @@ class DeliveryController {
       ],
     });
 
+    // Checking if the delivery exists
     if (!delivery) {
       return res.json({ error: 'Delivery does not exist.' });
     }
@@ -88,6 +91,7 @@ class DeliveryController {
   }
 
   async store(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       recipient_id: Yup.number().required(),
       deliveryman_id: Yup.number().required(),
@@ -103,15 +107,18 @@ class DeliveryController {
 
     const delivery = await Delivery.create(req.body);
 
+    // Search query
     const deliveryman = await Deliveryman.findByPk(delivery.deliveryman_id);
     const recipient = await Recipient.findByPk(delivery.recipient_id);
 
+    // Sending email
     await Queue.add(NewDeliveryMail.key, { deliveryman, recipient, delivery });
 
     return res.json(delivery);
   }
 
   async update(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       product: Yup.string(),
       start_date: Yup.date(),
@@ -131,8 +138,10 @@ class DeliveryController {
 
     const { id } = req.params;
 
+    // Search query
     const deliveryExist = await Delivery.findByPk(id);
 
+    // Checking if the delivery exists
     if (!deliveryExist) {
       return res.status(400).json({
         error: 'Delivery does not exist.',
@@ -147,12 +156,15 @@ class DeliveryController {
   async delete(req, res) {
     const { id } = req.params;
 
+    // Checking if the delivery id was provided
     if (!id) {
       return res.status(400).json({ error: 'Id not provided.' });
     }
 
+    // Search query
     const delivery = await Delivery.findByPk(id);
 
+    // Checking if the delivery exists
     if (!delivery) {
       return res.status(400).json({ error: 'Delivery does not exist.' });
     }

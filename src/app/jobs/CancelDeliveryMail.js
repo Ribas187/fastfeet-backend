@@ -1,5 +1,6 @@
 import Mail from '../../lib/Mail';
 
+// Class to configure the email
 class CancelDeliveryMail {
   get key() {
     return 'CancelDeliveryMail';
@@ -8,6 +9,7 @@ class CancelDeliveryMail {
   async handle({ data }) {
     const { delivery, deliveryman, recipient } = data;
 
+    // Sendind email
     await Mail.sendMail({
       to: `${deliveryman.name} <${deliveryman.email}>`,
       subject: 'Cancelamento de encomenda.',

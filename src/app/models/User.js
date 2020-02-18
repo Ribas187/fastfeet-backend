@@ -1,6 +1,7 @@
 import Sequelize, { Model } from 'sequelize';
 import bcrypt from 'bcryptjs';
 
+// User model
 class User extends Model {
   static init(sequelize) {
     super.init(
@@ -14,6 +15,7 @@ class User extends Model {
         sequelize,
       }
     );
+    // Hook to generate the password hash
     this.addHook('beforeSave', async user => {
       if (user.password) {
         user.password_hash = await bcrypt.hash(user.password, 8);
@@ -22,6 +24,7 @@ class User extends Model {
     return this;
   }
 
+  // Check if the password match with the hash
   checkPassword(password) {
     return bcrypt.compare(password, this.password_hash);
   }

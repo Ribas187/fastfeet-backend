@@ -5,12 +5,14 @@ import Recipient from '../models/Recipient';
 
 class RecipientController {
   async index(req, res) {
+    // Search query
     const recipient = await Recipient.findAll();
 
     return res.json(recipient);
   }
 
   async store(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       name: Yup.string().required(),
       street: Yup.string(),
@@ -35,21 +37,24 @@ class RecipientController {
       where: { name, number, postcode },
     });
 
+    // Checking if the recipient already exists
     if (recipientExists) {
       return res.status(400).json({
         error: 'Recipient already exists.',
       });
     }
 
+    // Getting the address based on the postcode, using the cep-orimise API
     const cepAddress = await cep(postcode).catch(() => null);
 
+    // Cheking if the postcode exists
     if (!cepAddress) {
       return res.status(400).json({ error: 'Invalid postcode.' });
     }
 
     const { state, city, street } = cepAddress;
 
-    const { id } = await Recipient.create({
+    const recipient = await Recipient.create({
       name,
       street,
       city,
@@ -59,19 +64,11 @@ class RecipientController {
       postcode,
     });
 
-    return res.json({
-      id,
-      name,
-      street,
-      city,
-      state,
-      number,
-      complement,
-      postcode,
-    });
+    return res.json(recipient);
   }
 
   async update(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       name: Yup.string(),
       street: Yup.string(),
@@ -92,14 +89,16 @@ class RecipientController {
 
     const recipient = await Recipient.findByPk(id);
 
+    // Checking if the recipient exists
     if (!recipient) {
-      return res.status(400).json({ error: 'User does not exist.' });
+      return res.status(400).json({ error: 'Recipient does not exist.' });
     }
 
     const { postcode, name, number } = req.body;
 
     const cepAddress = await cep(postcode).catch(() => null);
 
+    // Cheking if the postcode exists
     if (!cepAddress) {
       return res.status(400).json({ error: 'Invalid postcode.' });
     }

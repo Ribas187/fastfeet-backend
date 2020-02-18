@@ -1,3 +1,4 @@
+// Create delivery_problems table
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('delivery_problems', {

@@ -1,3 +1,4 @@
+// Create the users table
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('users', {

@@ -7,12 +7,15 @@ class DeliveredController {
     const { page = 1 } = req.query;
     const { id } = req.params;
 
+    // Search query
     const deliverymanExists = await Deliveryman.findByPk(id);
 
+    // Checking if the deliveryman exists
     if (!deliverymanExists) {
       return res.status(400).json({ error: 'Deliveryman ID does not exist.' });
     }
 
+    // Search query
     const deliveries = await Delivery.findAll({
       limit: 20,
       offset: (page - 1) * 20,

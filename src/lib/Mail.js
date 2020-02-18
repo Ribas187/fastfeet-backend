@@ -5,6 +5,7 @@ import nodemailerhbs from 'nodemailer-express-handlebars';
 
 import mailConfig from '../config/mail';
 
+// Class to configure the email sending
 class Mail {
   constructor() {
     const { host, port, secure, auth } = mailConfig;

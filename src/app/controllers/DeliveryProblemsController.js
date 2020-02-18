@@ -11,6 +11,7 @@ class DeliveryProblemsController {
   async index(req, res) {
     const { page = 1 } = req.query;
 
+    // Search query
     const deliveries = await DeliveryProblem.findAll({
       limit: 20,
       offset: (page - 1) * 20,
@@ -30,18 +31,22 @@ class DeliveryProblemsController {
   async show(req, res) {
     const { delivery_id } = req.params;
 
+    // Search query
     const deliveryExists = await Delivery.findByPk(delivery_id);
 
+    // Checking id the delivery exists
     if (!deliveryExists) {
       return res.status(400).json({ error: 'Delivery ID does not exist.' });
     }
 
+    // Search query
     const deliveryProblems = await DeliveryProblem.findAll({
       where: {
         delivery_id,
       },
     });
 
+    // Checking if there are problems
     if (deliveryProblems.length === 0) {
       return res
         .status(400)
@@ -52,6 +57,7 @@ class DeliveryProblemsController {
   }
 
   async store(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       description: Yup.string().required(),
     });
@@ -65,8 +71,10 @@ class DeliveryProblemsController {
     const { delivery_id } = req.params;
     const { description } = req.body;
 
+    // Search query
     const deliveryExists = await Delivery.findByPk(delivery_id);
 
+    // Checking if the delivery exists
     if (!deliveryExists) {
       return res.status(400).json({ error: 'Delivery ID does not exist.' });
     }
@@ -82,16 +90,20 @@ class DeliveryProblemsController {
   async delete(req, res) {
     const { problem_id } = req.params;
 
+    // Search query
     const problem = await DeliveryProblem.findByPk(problem_id);
 
+    // Checking if the delivery problem exists
     if (!problem) {
       return res
         .status(400)
         .json({ error: 'Delivery Problem ID does not exist.' });
     }
 
+    // Search query
     const delivery = await Delivery.findByPk(problem.delivery_id);
 
+    // Checking if delivery is canceled
     if (delivery.canceled_at) {
       return res.status(400).json({
         error: 'Delivery has already been canceled.',
@@ -104,9 +116,11 @@ class DeliveryProblemsController {
 
     delivery.save();
 
+    // Search query
     const deliveryman = await Deliveryman.findByPk(delivery.deliveryman_id);
     const recipient = await Recipient.findByPk(delivery.recipient_id);
 
+    // Sending email
     await Queue.add(CancelDeliveryMail.key, {
       deliveryman,
       recipient,

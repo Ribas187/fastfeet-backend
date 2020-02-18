@@ -4,8 +4,10 @@ import NewDeliveryMail from '../app/jobs/NewDeliveryMail';
 import CancelDeliveryMail from '../app/jobs/CancelDeliveryMail';
 import redisConfig from '../config/redis';
 
+// Array of email types
 const jobs = [NewDeliveryMail, CancelDeliveryMail];
 
+// Class to configure the queue with redis and emails
 class Queue {
   constructor() {
     this.queues = {};
@@ -37,6 +39,7 @@ class Queue {
   }
 
   handleFailure(job, err) {
+    // eslint-disable-next-line no-console
     console.log(`Queue ${job.queue.name}: FAILED`, err);
   }
 }

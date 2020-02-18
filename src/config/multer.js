@@ -2,6 +2,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import { extname, resolve } from 'path';
 
+// Multer configs(configs to save files)
 export default {
   storage: multer.diskStorage({
     destination: resolve(__dirname, '..', '..', 'tmp', 'uploads'),

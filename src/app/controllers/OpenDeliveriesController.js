@@ -8,10 +8,12 @@ class OpenDeliveriesController {
 
     const deliverymanExists = await Deliveryman.findByPk(id);
 
+    // Checking if deliveryman exists
     if (!deliverymanExists) {
       return res.status(400).json({ error: 'Deliveryman ID does not exist.' });
     }
 
+    // Listing open deliveries/ Search query
     const deliveries = await Delivery.findAll({
       limit: 20,
       offset: (page - 1) * 20,

@@ -1,5 +1,6 @@
 import Mail from '../../lib/Mail';
 
+// Class to configure the email
 class NewDeliveryMail {
   get key() {
     return 'NewDeliveryMail';
@@ -8,6 +9,7 @@ class NewDeliveryMail {
   async handle({ data }) {
     const { delivery, deliveryman, recipient } = data;
 
+    // Sendind email
     await Mail.sendMail({
       to: `${deliveryman.name} <${deliveryman.email}>`,
       subject: 'Nova encomenda cadastrada.',

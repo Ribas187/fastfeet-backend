@@ -6,6 +6,7 @@ class FinishDeliveryController {
   async update(req, res) {
     const { deliveryman_id, delivery_id } = req.params;
 
+    // Checking if a file was sent
     if (!req.file) {
       return res
         .status(400)
@@ -16,10 +17,12 @@ class FinishDeliveryController {
 
     const deliverymanExists = await Deliveryman.findByPk(deliveryman_id);
 
+    // Checking if deliveryman exists
     if (!deliverymanExists) {
       return res.status(400).json({ error: 'Deliveryman ID does not exist.' });
     }
 
+    // Search query
     const deliveryExists = await Delivery.findByPk(delivery_id, {
       include: {
         model: Deliveryman,
@@ -28,6 +31,7 @@ class FinishDeliveryController {
       },
     });
 
+    // Verifications
     if (!deliveryExists) {
       return res.status(400).json({ error: 'Delivery ID does not exist.' });
     }
@@ -47,6 +51,7 @@ class FinishDeliveryController {
       });
     }
 
+    // Adding the file to DB
     const file = await File.create({
       name,
       path,

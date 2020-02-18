@@ -4,12 +4,14 @@ import User from '../models/User';
 
 class UserController {
   async index(req, res) {
+    // Search query
     const users = await User.findAll();
 
     return res.json(users);
   }
 
   async store(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       name: Yup.string().required(),
       email: Yup.string()
@@ -29,6 +31,7 @@ class UserController {
 
     const userExists = await User.findOne({ where: { email: req.body.email } });
 
+    // Checking if the user already exists
     if (userExists) {
       return res.status(400).json({ error: 'User already exists' });
     }
@@ -43,6 +46,7 @@ class UserController {
   }
 
   async update(req, res) {
+    // Fields validation
     const schema = Yup.object().shape({
       name: Yup.string(),
       email: Yup.string().email(),
@@ -66,6 +70,7 @@ class UserController {
 
     const user = await User.findByPk(id);
 
+    // Checking if the user already exists
     if (email && email !== user.email) {
       const userExists = await User.findOne({ where: { email } });
 
@@ -74,6 +79,7 @@ class UserController {
       }
     }
 
+    // Checking if the password match
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
       return res.status(401).json({ error: 'Password does not match' });
     }

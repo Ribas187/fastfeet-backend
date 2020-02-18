@@ -1,5 +1,6 @@
 import Sequelize, { Model } from 'sequelize';
 
+// Deliveryman model
 class Deliveryman extends Model {
   static init(sequelize) {
     super.init(
@@ -15,6 +16,7 @@ class Deliveryman extends Model {
     return this;
   }
 
+  // Making the relationships
   static associate(models) {
     this.belongsTo(models.File, { foreignKey: 'avatar_id', as: 'avatar' });
   }

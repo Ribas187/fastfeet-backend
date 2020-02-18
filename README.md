@@ -1,92 +1,105 @@
 <h1 align="center">
-  <img alt="Fastfeet" title="Fastfeet" src="https://raw.githubusercontent.com/Rocketseat/bootcamp-gostack-desafio-02/master/.github/logo.png" width="300px" />
+  <img alt="Fastfeet" title="Fastfeet" src=".github/logo.png" width="300px" />
 </h1>
 
 <h3 align="center">
-  Desafio 2: FastFeet, o início
+  FastFeet: Back-end
 </h3>
 
 <h3 align="center">
-  :warning: Etapa 1/4 do Desafio Final :warning:
+  :warning: Etapa 2/4 do Desafio Final :warning:
 </h3>
 
+<blockquote align="center">“Não espere para plantar, apenas tenha paciência para colher”!</blockquote>
+
+<p align="center">
+<a href="#rocket-sobre-o-desafio">Sobre o desafio</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="#um-pouco-sobre-as-ferramentas">Ferramentas</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="#como-instalar-o-projeto-na-sua-máquina">Como Instalar </a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+<a href="#funcionalidades">Funcionalidades</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+
+
 ## :rocket: Sobre o desafio
+Esse desafio é a segunda parte do Desafio Final
 
-A aplicação é um app para uma transportadora, o FastFeet.
+Continuação do desenvolvimento de um app para uma transportadora fictícia, o FastFeet.
 
-Nesse primeiro desafio foi usado diversas funcionalidades aprendidas durando o GoStack Bootcamp. Esse projeto será desenvolvido aos poucos até o fim da sua jornada ter uma aplicação completa envolvendo back-end, front-end e mobile, que será utilizada para a **certificação do bootcamp**, então, bora pro código!
+Nesta parte do projeto foi terminada a aplicação back-end do FastFeet.
+A API possui deiversas funcionalidades e faz parte de um projeto final com back-end, front-end e mobile.
 
-### **Um pouco sobre as ferramentas**
+## **Um pouco sobre as ferramentas**
+Durante a resolução do desafio, utilizei as ferramentas :
 
-A aplicação foi feita utilizando o [Express](https://expressjs.com/), além do auxílio de outras ferramentas como:
+- NodeJS
+- Yarn
+- Express
+- Sucrase
+- Nodemon
+- ESLint
+- Prettier
+- EditorConfig
+- [Yup] (https://github.com/jquense/yup)
+- [Sequelize] (https://sequelize.org/master/) (PostgreSQL);
+- [jsonwebtoken] (https://github.com/auth0/node-jsonwebtoken)
+- [bcryptjs] (https://www.npmjs.com/package/bcryptjs)
+- [date-fns] (https://date-fns.org/)
+- [Multer] (https://github.com/expressjs/multer)
+- [NodeMailer] (https://nodemailer.com/about/)
+- [Handlebars] (https://handlebarsjs.com/) (Templates Engines)
+- [Beequeue] (https://github.com/bee-queue/bee-queue) (Background job)
 
-- Sucrase + Nodemon;
-- ESLint + Prettier + EditorConfig;
-- Sequelize (Utilize PostgreSQL ou MySQL);
+## **Como instalar o projeto na sua máquina**
+1. Git clone.
+2. Instale as dependecias do projeto :&nbsp;&nbsp;&nbsp; `yarn add`&nbsp;  ou &nbsp; `npm install`
+3. Reenomeie o arquivo **.env.example** para **.env**
+4. Configure as variáveis de ambiente (arquivo .env) de acordo com seu ambiente local.
+5. Rodar as seeds e migrations:
+```sh
+yarn sequelize db:migrate
+yarn sequelize db:seed:all
+```
+6. Após finalizar as configurações, inicie a aplicação executando no seu terminal `yarn dev`
 
-### **Bibliotecas utilizadas**
-- [**express**] (https://expressjs.com/pt-br/starter/installing.html)
-- [**sequelize**] (https://sequelize.org/v5/index.html)
-- [**jsonwebtoken**] (https://github.com/auth0/node-jsonwebtoken)
-- [**bcryptjs**] (https://www.npmjs.com/package/bcryptjs)
-- [**yup**] (https://github.com/jquense/yup)
+## **Funcionalidades**
 
-### **Funcionalidades**
+Abaixo estão descritas as funcionalidades da API.
 
-Abaixo estão descritas as funcionalidades da aplicação.
+### **1. Autenticação dos Administradores**
 
-### **1. Autenticação**
+Permissão para que um usuário se autentique na aplicação utilizando e-mail e uma senha.
 
-Permita que um usuário se autentique em sua aplicação utilizando e-mail e uma senha.
+- A autenticação foi feita utilizando JWT.
+- Validação dos dados de entrada.
+- Administrador tem acesso a todas as rotas da aplicação.
+- Pode gerenciar todos os entregadores, destinatários e entregas.
 
-Crie um usuário administrador utilizando a funcionalidade de [seeds do sequelize](https://sequelize.org/master/manual/migrations.html#creating-first-seed), essa funcionalidade serve para criarmos registros na base de dados de forma automatizada.
+### **2. Gestão de destinatários**
 
-Para criar um seed utilize o comando:
+Permissão para que os destinatários sejam mantidos (cadastrados/atualizados) na aplicação.
 
-    yarn sequelize seed:generate --name admin-user
+- O gerenciamento de destinatários só pode ser feito por administradores autenticados na aplicação.
+- Validação dos dados de entrada
+- O destinatário não pode se autenticar no sistema, ou seja, não possui senha.
 
-No arquivo gerado na pasta `src/database/seeds` adicione o código referente à criação de um usuário administrador:
+### **3. Gestão de entregadores**
 
-    const bcrypt = require("bcryptjs");
+CRUD para que os entregadores sejam mantidos na aplicação.
 
-    module.exports = {
-      up: QueryInterface => {
-        return QueryInterface.bulkInsert(
-          "users",
-          [
-            {
-              name: "Distruidora FastFeet",
-              email: "admin@fastfeet.com",
-              password_hash: bcrypt.hashSync("123456", 8),
-              created_at: new Date(),
-              updated_at: new Date()
-            }
-          ],
-          {}
-        );
-      },
+- O gerencimaneto de entregadores só pode ser feito por administradores autenticados na aplicação.
+- Validação dos dados de entrada
+- O entregador não pode se autenticar no sistema, ou seja, não possui senha.
+- O entregador pode visualizar as entregas vinculadas a ele.
+- O entregador pode iniciar uma entrega desde que esteja dentro do horário ( 08: as 18:00 ), e desde que não tenha atingido a cota de  5 ou entregas iniciadas no dia.
+- O entregador pode finalizar uma entrega, desde que envie uma foto de sua assinatura.
+- O entregador pode cadastrar um problema nas suas entregas.
 
-      down: () => {}
-    };
+### **4. Gestão de encomendas**
 
-Agora execute:
+CRUD para que as encomendas sejam mantidas na aplicação.
 
-    yarn sequelize db:seed:all
-
-Agora você tem um usuário na sua base de dados, utilize esse usuário para todos os logins que você fizer.
-
-- A autenticação deve ser feita utilizando JWT.
-- Realize a validação dos dados de entrada;
-
-### 2. Gestão de destinatários
-
-Você agora precisa permitir que destinatários sejam mantidos (cadastrados/atualizados) na aplicação, e esses devem ter o **nome** do destinatário e campos de endereço: **rua**, **número**, **complemento**, **estado**, **cidade** e **CEP**.
-
-Utilize uma nova tabela no banco de dados chamada `recipient` para guardar informações do destinatário.
-
-O cadastro de destinatários só pode ser feito por administradores autenticados na aplicação.
-
-O destinatário não pode se autenticar no sistema, ou seja, não possui senha.
+- O gerencimaneto de encomendas só pode ser feito por administradores autenticados na aplicação.
+- Validação dos dados de entrada.
+- A retirada de encomendas só pode ser feita entre 08:00 e 18:00 horas
 
 ## :memo: Guilherme Ribas
 Desafio realizado por Guilherme Ribas.

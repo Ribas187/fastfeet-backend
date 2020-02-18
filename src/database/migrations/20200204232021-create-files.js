@@ -1,3 +1,4 @@
+// Create the files table
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('files', {

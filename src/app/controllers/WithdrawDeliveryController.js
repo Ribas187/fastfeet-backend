@@ -10,10 +10,12 @@ class WithdrawDeliveryController {
 
     const deliverymanExists = await Deliveryman.findByPk(deliveryman_id);
 
+    // Checking if the deliveryman exists
     if (!deliverymanExists) {
       return res.status(400).json({ error: 'Deliveryman ID does not exist.' });
     }
 
+    // Search query
     const deliveryExists = await Delivery.findByPk(delivery_id, {
       include: {
         model: Deliveryman,
@@ -22,6 +24,7 @@ class WithdrawDeliveryController {
       },
     });
 
+    // Verifications
     if (!deliveryExists) {
       return res.status(400).json({ error: 'Delivery ID does not exist.' });
     }
@@ -46,16 +49,18 @@ class WithdrawDeliveryController {
       });
     }
 
-    const withdrawHour = 10;
+    const withdrawHour = new Date().getHours();
 
+    // Check if the withdraw is between 08:00 and 18:00h.
     if (withdrawHour < 8 || withdrawHour > 18) {
       return res.status(400).json({
         error: 'You can only withdraw from 08:00h to 18:00h.',
       });
     }
 
-    const today = 1581729334000;
+    const today = new Date().valueOf();
 
+    // Search query
     const todayWithdraws = await Delivery.findAll({
       where: {
         deliveryman_id,
@@ -65,6 +70,7 @@ class WithdrawDeliveryController {
       },
     });
 
+    // Checking if the max withdraw per day is reached
     if (todayWithdraws.length >= 5) {
       return res.status(400).json({
         error: 'You can only withdraw up to 5 deliveries per day',
